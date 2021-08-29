@@ -1,0 +1,21 @@
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: export db
+      shell: wp db export --porcelain
+      args:
+        chdir: www/autumnsky/
+      register: export_result
+
+    - name: fetch db sql
+      fetch:
+        flat: yes
+        src: www/autumnsky/{{export_result.stdout}}
+        dest: /home/akiya/
+
+    - name: delete sql dump
+      file:
+        state: absent
+        path: www/autumnsky/{{export_result.stdout}}
+
